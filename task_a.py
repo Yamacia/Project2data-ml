@@ -32,7 +32,7 @@ lambdas = np.logspace(-5, -1, 5)
 rho = 0.9
 rho2 = 0.999
 momentum = 0.03
-batchList = generate_batches(X_train, 7)
+batches = 1
 
 scheduler_list = [
     "Constant",
@@ -44,19 +44,24 @@ scheduler_list = [
 ]
 
 #best values for every scheduler
-best_params = []
 best_etas = np.zeros(6)
 best_lambdas = np.zeros(6)
 best_batches = np.zeros(6)
+i = 0
+
 for s in scheduler_list:
-    color = plt.get_cmap("viridis")
-    heatmap, best_eta, best_lambda = ffnn.optimze_params(X_train, z_train, etas, lambdas, s, batchList[1], epochs, momentum=momentum, rho=rho, rho2=rho2, folds=5)
-    print(best_eta, best_lambda)
+    heatmap, best_eta, best_lambda = ffnn.optimze_params(X_train, z_train, etas, lambdas, s, batches, epochs, momentum=momentum, rho=rho, rho2=rho2, folds=5)
+    print(f"\n Best eta for {s}: {best_eta}, Best lambda: {best_lambda}")
     ax = sns.heatmap(heatmap, xticklabels=lambdas, yticklabels=etas, annot=True)
     plt.xlabel("lambda value")
     plt.ylabel("eta value")
     plt.title(f"{s}, average validation score over {folds} folds")
     plt.show()
+    best_etas[i] = best_eta
+    best_lambdas[i] = best_lambda
+    i += 1
+
+
 
 
 

@@ -54,10 +54,6 @@ def generate_synth_dataset(use_franke, noise, step, maxDegree):
 
 	return x, y, z, X, X_train, X_test, z_train, z_test
 	
-def generate_batches(X, nBatches):
-	batches = np.logspace(0, np.log(X.shape[0] + 1), nBatches, base = np.exp(1), dtype = int)
-	return batches
-
 def min_max_scaler(data):
     """
     Perform Min-Max scaling on a given dataset.
