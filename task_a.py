@@ -9,10 +9,8 @@ from utils import *
 
 np.random.seed(1984)
 
-#Step size between 1, 0. Number of points for 0.05 = 20.
-step = 0.05
-#Beta values 
-betas = 10
+#Step size between 1, 0. Number of points for 0.01 = 100.
+step = 0.01
 #Noise param for Franke function, use 0.0 for no noise
 noise = 0.05
 #If True use Franke, if False use Skranke
@@ -27,13 +25,13 @@ x, y, z, X, X_train, X_test, z_train, z_test = generate_synth_dataset(use_franke
 
 ffnn = FFNN((X.shape[1], 1), seed = 1984)
 
-etas = np.logspace(-5, -1, 5)
+etas = np.logspace(-4, -1, 4)
 lambdas = np.logspace(-5, -1, 5)
+lambdas = np.insert(lambdas, 0, 0)
 rho = 0.9
 rho2 = 0.999
-momentum = 0.03
-batches = 1
-
+momentum = 0.5
+batches = 15
 scheduler_list = [
     "Constant",
     "Momentum",
@@ -52,10 +50,10 @@ i = 0
 for s in scheduler_list:
     heatmap, best_eta, best_lambda = ffnn.optimze_params(X_train, z_train, etas, lambdas, s, batches, epochs, momentum=momentum, rho=rho, rho2=rho2, folds=5)
     print(f"\n Best eta for {s}: {best_eta}, Best lambda: {best_lambda}")
-    ax = sns.heatmap(heatmap, xticklabels=lambdas, yticklabels=etas, annot=True)
+    ax = sns.heatmap(heatmap, xticklabels=lambdas, yticklabels=etas, annot=True, fmt = ".5f")
     plt.xlabel("lambda value")
     plt.ylabel("eta value")
-    plt.title(f"{s}, average validation score over {folds} folds")
+    plt.title(f"{s}, average validation error over {folds} folds")
     plt.show()
     best_etas[i] = best_eta
     best_lambdas[i] = best_lambda

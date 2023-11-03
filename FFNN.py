@@ -10,6 +10,7 @@ from sklearn.utils import resample
 from cost_functions import *
 from activation_functions import *
 from schedulers import *
+from sklearn.preprocessing import MinMaxScaler
 
 warnings.simplefilter("error")
 
@@ -483,29 +484,35 @@ class FFNN:
         X, t = resample(X, t)
         batch_size = X.shape[0] // folds
         cv = []
+        min_max_scaler = MinMaxScaler()
 
         for fold in range(folds):
             start_index = fold * batch_size
             end_index = (fold + 1) * batch_size if fold < folds - 1 else None
-            X_val = X[start_index:end_index, :]
-            t_val = t[start_index:end_index, :]
+            X_val_fold = X[start_index:end_index, :]
+            t_val_fold = t[start_index:end_index, :]
 
-            X_train = np.delete(X, range(start_index, start_index + X_val.shape[0]), axis=0)
-            t_train = np.delete(t, range(start_index, start_index + t_val.shape[0]), axis=0)
+            X_train_fold = np.delete(X, range(start_index, start_index + X_val_fold.shape[0]), axis=0)
+            t_train_fold = np.delete(t, range(start_index, start_index + t_val_fold.shape[0]), axis=0)
 
-            cv.append((X_train, t_train, X_val, t_val))
+            # Scale the data
+            X_train_fold_scaled = min_max_scaler.fit_transform(X_train_fold)
+            X_val_fold_scaled = min_max_scaler.transform(X_val_fold)
 
-        avg_scores = None
+            cv.append((X_train_fold_scaled, t_train_fold, X_val_fold_scaled, t_val_fold))
+
+        cv_scores = None
 
         for X_train, t_train, X_val, t_val in cv:
             self.reset_weights()
-            scores = self.fit(X_train, t_train, scheduler, batches, epochs, lam, X_val, t_val)
+            scaled_batches = max(int(batches / X.shape[0] / X_train.shape[0]), 1)
+            scores = self.fit(X_train, t_train, scheduler, scaled_batches, epochs, lam, X_val, t_val)
             
-            if avg_scores is None:
-                avg_scores = {key: value / folds for key, value in scores.items()}
+            if cv_scores is None:
+                cv_scores = {key: value / folds for key, value in scores.items()}
             else:
-                avg_scores = {key: avg_scores[key] + value / folds for key, value in scores.items()}
-        return avg_scores
+                cv_scores = {key: cv_scores[key] + value / folds for key, value in scores.items()}
+        return cv_scores
     
 
     def optimze_params(self,
