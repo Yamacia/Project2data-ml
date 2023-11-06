@@ -16,10 +16,11 @@ noise = 0.05
 #If True use Franke, if False use Skranke
 use_franke = True
 #Max polynomial degree
-maxDegree = 10
+maxDegree = 15
 #Number of epochs
 epochs = 1000
-folds = 5
+#Number of folds for cross validation
+folds = 10
 #Generates either Skranke or Franke dataset
 x, y, z, X, X_train, X_test, z_train, z_test = generate_synth_dataset(use_franke, noise, step, maxDegree)
 
@@ -44,11 +45,10 @@ scheduler_list = [
 #best values for every scheduler
 best_etas = np.zeros(6)
 best_lambdas = np.zeros(6)
-best_batches = np.zeros(6)
 i = 0
 
 for s in scheduler_list:
-    heatmap, best_eta, best_lambda = ffnn.optimze_params(X_train, z_train, etas, lambdas, s, batches, epochs, momentum=momentum, rho=rho, rho2=rho2, folds=5)
+    heatmap, best_eta, best_lambda = ffnn.optimze_params(X_train, z_train, etas, lambdas, s, batches, epochs, momentum=momentum, rho=rho, rho2=rho2, folds = folds)
     print(f"\n Best eta for {s}: {best_eta}, Best lambda: {best_lambda}")
     ax = sns.heatmap(heatmap, xticklabels=lambdas, yticklabels=etas, annot=True, fmt = ".5f")
     plt.xlabel("lambda value")

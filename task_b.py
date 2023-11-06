@@ -21,8 +21,8 @@ use_franke = True
 #Max polynomial degree
 maxDegree = 10
 #Number of epochs
-epochs = 500
-folds = 5
+epochs = 1000
+folds = 6
 #Generates either Skranke or Franke dataset
 x, y, z, X, X_train, X_test, z_train, z_test = generate_synth_dataset(use_franke, noise, step, maxDegree)
 eta = 0.001
@@ -31,7 +31,7 @@ rho = 0.9
 rho2 = 0.99
 
 scheduler = Adam(eta, rho, rho2)
-
+scheduler2 = AdagradMomentum(eta, momentum = 0.5)
 hidden_layer_sizes = (60, 60, 60)
 output_layer_size = 1
 ffnn = FFNN((X.shape[1] , *hidden_layer_sizes, output_layer_size), hidden_func=sigmoid, seed=1984)
@@ -58,5 +58,16 @@ plt.plot(mlp_scores, label="scikit error")
 plt.legend()
 plt.xlabel("Epochs")
 plt.ylabel("MSE")
-plt.title("MSE as a function of Epochs for our FFNN and Scikit MLP regressor")
+plt.title("MSE as a function of Epochs for our FFNN and Scikit MLP regressor using Adam")
+plt.show()
+
+scores2 = ffnn.cross_validation(X, z.reshape(-1, 1), folds, scheduler2, 1, epochs, lam)
+
+plt.plot(scores2["train_errors"], label="Train set error FFNN")
+plt.plot(scores2["val_errors"], label="Val set error FFNN")
+plt.plot(mlp_scores, label="scikit error")
+plt.legend()
+plt.xlabel("Epochs")
+plt.ylabel("MSE")
+plt.title("MSE as a function of Epochs for our FFNN and Scikit MLP regressor using Adagrad Momentum")
 plt.show()
