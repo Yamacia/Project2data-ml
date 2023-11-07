@@ -54,20 +54,3 @@ def generate_synth_dataset(use_franke, noise, step, maxDegree):
 
 	return x, y, z, X, X_train, X_test, z_train, z_test
 	
-def min_max_scaler(data):
-    """
-    Perform Min-Max scaling on a given dataset.
-
-    Min-Max scaling rescales the values in the input array 'X' to a given range
-    .
-    Parameters:
-    x (np.array): The input dataset to be scaled.
-
-    Returns:
-    scaled(np.array): The scaled dataset with values in the range [0, 1].
-    """
-    min_i = min(data)
-    max_i = max(data)
-    
-    scaled = (data-min_i)/(max_i-min_i)
-    return scaled

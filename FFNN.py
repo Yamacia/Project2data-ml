@@ -528,7 +528,7 @@ class FFNN:
         momentum = 0.03,
         rho = 0.9,
         rho2 = 0.99,
-        folds : int = 1,
+        folds : int = 10,
         ):
 
         n_etas = len(etas)
