@@ -505,7 +505,7 @@ class FFNN:
 
         for X_train, t_train, X_val, t_val in cv:
             self.reset_weights()
-            scaled_batches = max(int(batches / X.shape[0] / X_train.shape[0]), 1)
+            scaled_batches = max(int(batches / (X.shape[0] / X_train.shape[0])), 1)
             scores = self.fit(X_train, t_train, scheduler, scaled_batches, epochs, lam, X_val, t_val)
             
             if cv_scores is None:
@@ -550,7 +550,7 @@ class FFNN:
                     sched = RMS_prop(eta, rho)
                 elif scheduler == "Adam":
                     sched = Adam(eta, rho, rho2)
-                scores = self.cross_validation(X, t, folds, sched, batches, epochs, lam)
+                scores = self.cross_validation(X, t, folds, sched, batches = batches, epochs = epochs, lam = lam)
                 val_scores = scores["val_errors"]
                 loss_heatmap[i,j] = val_scores[-1]
                 self.reset_weights()

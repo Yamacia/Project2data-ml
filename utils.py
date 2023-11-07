@@ -4,6 +4,8 @@ from functools import partial
 from sklearn.metrics import mean_squared_error, r2_score
 from autograd import grad
 from sklearn.model_selection import train_test_split
+from FFNN import *
+
 
 def FrankeFunction(x,y, noise = 0.0):
     if noise != 0.0:
@@ -38,6 +40,7 @@ def create_X(x, y, n ):
 def generate_synth_dataset(use_franke, noise, step, maxDegree):
 	x = np.arange(0, 1, step)
 	y = np.arange(0, 1, step)
+	x, y = np.meshgrid(x,y)
 	if use_franke:
 		z = FrankeFunction(x, y, noise)
 	else:
@@ -54,3 +57,26 @@ def generate_synth_dataset(use_franke, noise, step, maxDegree):
 
 	return x, y, z, X, X_train, X_test, z_train, z_test
 	
+def optimize_n_hidden_layers(X, t, folds, scheduler, batches, epochs, lam, n_nodes, max_layers):
+	scores_list = []
+	attempted_layers = []
+	for i in range(1, max_layers + 1):
+		hidden_layer = (n_nodes,) * i
+		ffnn = FFNN(dimensions=(X.shape[1], *hidden_layer, 1), hidden_func=sigmoid, seed=1984, output_func= lambda x: x)
+		scores = ffnn.cross_validation(X, t.reshape(-1, 1), folds, scheduler, batches, epochs, lam)
+		scores_list.append(scores)
+		attempted_layers.append(hidden_layer)
+		print(hidden_layer)
+	return scores_list, attempted_layers
+
+def optimize_n_nodes(X, t, folds, scheduler, batches, epochs, lam, hidden_layers, n_nodes):
+	scores_list = []
+	attempted_layers = []
+	for nodes in (n_nodes):
+		hidden_layer = (nodes,) * hidden_layers
+		ffnn = FFNN(dimensions=(X.shape[1], *hidden_layer, 1), hidden_func=sigmoid, seed=1984, output_func= lambda x: x)
+		scores = ffnn.cross_validation(X, t.reshape(-1, 1), folds, scheduler, batches, epochs, lam)
+		scores_list.append(scores)
+		attempted_layers.append(hidden_layer)
+		print(hidden_layer)
+	return scores_list, attempted_layers
