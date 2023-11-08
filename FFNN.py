@@ -534,7 +534,7 @@ class FFNN:
         n_etas = len(etas)
         n_lambdas = len(lams)
 
-        loss_heatmap = np.zeros((n_etas, n_lambdas))
+        heatmap = np.zeros((n_etas, n_lambdas))
 
         for i, eta in enumerate(etas):
             for j, lam in enumerate(lams):
@@ -551,14 +551,19 @@ class FFNN:
                 elif scheduler == "Adam":
                     sched = Adam(eta, rho, rho2)
                 scores = self.cross_validation(X, t, folds, sched, batches = batches, epochs = epochs, lam = lam)
-                val_scores = scores["val_errors"]
-                loss_heatmap[i,j] = val_scores[-1]
+                if self.classification:
+                    val_scores = scores["val_accs"]
+                else:
+                    val_scores = scores["val_errors"]
+                    
+                heatmap[i,j] = val_scores[-1]
                 self.reset_weights()
-        
-        i, j = np.unravel_index(np.nanargmin(loss_heatmap), loss_heatmap.shape)
-
+        if self.classification:
+            i, j = np.unravel_index(np.nanargmax(heatmap), heatmap.shape)
+        else:
+            i, j = np.unravel_index(np.nanargmin(heatmap), heatmap.shape)
         best_eta = etas[i]
         best_lambda = lams[j]
 
-        return(loss_heatmap, best_eta, best_lambda)
+        return(heatmap, best_eta, best_lambda)
     
