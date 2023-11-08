@@ -1,13 +1,12 @@
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
 
 from schedulers import *
 from FFNN import *
 from utils import *
 
-np.random.seed(1984)
+seed = np.random.seed(4231)
 
 #Number of datapoints to generate for
 datapoints = 20
@@ -16,28 +15,28 @@ noise = 0.05
 #If True use Franke, if False use Skranke
 use_franke = True
 #Max polynomial degree
-maxDegree = 10
+maxDegree = 8
 #Number of epochs
-epochs = 200
+epochs = 500
 #Number of folds for cross validation
 folds = 5
 #Generates either Skranke or Franke dataset
 x, y, z, X, X_train, X_test, z_train, z_test = generate_synth_dataset(use_franke, noise, 1 / datapoints, maxDegree)
-ffnn = FFNN((X.shape[1], 1), seed = 1984)
+ffnn = FFNN((X.shape[1], 1), seed = seed)
 etas = np.logspace(-4, -1, 4)
 lambdas = np.logspace(-5, -1, 5)
 lambdas = np.insert(lambdas, 0, 0)
 rho = 0.9
-rho2 = 0.999
+rho2 = 0.99
 momentum = 0.5
-batches = 20
+batches = 32
 scheduler_list = [
     "Constant",
     "Momentum",
     "Adagrad",
     "AdagradMomentum",
     "RMS_prop",
-    "Adam"
+    "Adam",
 ]
 
 #best values for every scheduler
@@ -58,6 +57,14 @@ for s in scheduler_list:
     i += 1
 
 
-
+"""
+|Scheduler      |eta |lambda      |mse   |
+|Constant       |0.1 |1e-5/0.00001|0.0146|
+|Momentum       |0.1 |1e-5        |0.0105|
+|Adagrad        |0.1 |0.01        |0.0264|
+|AdagradMomentum|0.1 |0.001       |0.0165|
+|RMS prop       |0.01|1e'5        |0.0174|
+|Adam           |0.01|0.001       |0.0167|
+"""
 
 
