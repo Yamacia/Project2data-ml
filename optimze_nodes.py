@@ -8,8 +8,7 @@ from schedulers import *
 from FFNN import *
 from utils import *
 
-np.random.seed(4231)
-
+seed = np.random.seed(4231)
 
 #Number of datapoints to generate for
 datapoints = 20
@@ -18,23 +17,23 @@ noise = 0.05
 #If True use Franke, if False use Skranke
 use_franke = True
 #Max polynomial degree
-maxDegree = 10
+maxDegree = 8
 #Number of epochs
-epochs = 200
+epochs = 500
 #Number of folds for cross validation
 folds = 5
 #Generates either Skranke or Franke dataset
 x, y, z, X, X_train, X_test, z_train, z_test = generate_synth_dataset(use_franke, noise, 1 / datapoints, maxDegree)
-eta = 0.001
-lam = 0.001
+eta = 0.01
+lam = 1e-05
 rho = 0.9
 rho2 = 0.99
 batches = 32
-nodes_in_layer = 32
+nodes_in_layer = 16
 layers_to_try = 5
 
 scheduler = Adam(eta, rho, rho2)
-hidden_func = LRELU
+hidden_func = sigmoid
 n_layers_scores, layer = optimize_n_hidden_layers(X_train, z_train, folds, scheduler, batches, epochs, lam, nodes_in_layer, layers_to_try, hidden_func)
 
 
@@ -71,3 +70,9 @@ plt.legend()
 plt.xlabel("Epochs")
 plt.ylabel("MSE")
 plt.show()
+
+"""
+Hidden layer for RELU: (16,16,16)
+Hidden layer for RELU: (8,8,8)
+Hidden layer for sigmoid: (8,8,8)
+"""

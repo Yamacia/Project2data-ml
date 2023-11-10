@@ -16,7 +16,7 @@ noise = 0.05
 #If True use Franke, if False use Skranke
 use_franke = True
 #Max polynomial degree
-maxDegree = 10
+maxDegree = 8
 #Number of epochs
 epochs = 200
 #Number of folds for cross validation
@@ -28,8 +28,8 @@ rho2 = 0.99
 momentum = 0.5
 batches = 32
 #hidden layer configuration gotten from optimize_nodes.py
-adam = Adam(eta = 0.00001 , rho = rho, rho2 = rho2)
-hidden_layer_sizes = (64, 64, 64, 64, 64)
+adam = Adam(eta = 0.001 , rho = rho, rho2 = rho2)
+hidden_layer_sizes = (8,8,8)
 output_layer_size = 1
 
 mlp_regressor = MLPRegressor(
@@ -50,7 +50,7 @@ mlp_scores = mlp_regressor.loss_curve_
 
 ffnn = FFNN((X.shape[1] , *hidden_layer_sizes, output_layer_size), hidden_func=sigmoid, seed=1984, output_func= lambda x: x)
 
-scores_adam = ffnn.cross_validation(X, z.reshape(-1, 1), folds, adam, batches, epochs, lam = 0.001)
+scores_adam = ffnn.cross_validation(X, z.reshape(-1, 1), folds, adam, batches, epochs, lam = 1e-05)
 
 
 

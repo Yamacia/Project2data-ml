@@ -81,10 +81,13 @@ def optimize_n_nodes(X, t, folds, scheduler, batches, epochs, lam, hidden_layers
 		print(f"\n Hidden layer: {hidden_layer}")
 	return scores_list, attempted_layers
 
-def optimize_func(X, t, folds, scheduler, batches, epochs, lam, hidden_layer, hidden_funcs):
+def run_funcs(X, t, folds, batches, epochs, etas, lambdas, hidden_layers, hidden_funcs):
 	scores_list = []
+	i = 0
 	for func in hidden_funcs:
-		ffnn = FFNN(dimensions=(X.shape[1], *hidden_layer, 1), hidden_func=func, seed=4231, output_func= lambda x: x)
-		scores = ffnn.cross_validation(X, t.reshape(-1, 1), folds, scheduler, batches, epochs, lam)
+		adam = Adam(etas[i], rho = 0.9, rho2 = 0.99)
+		ffnn = FFNN(dimensions=(X.shape[1], *(hidden_layers[i]), 1), hidden_func=func, seed=4231, output_func= lambda x: x)
+		scores = ffnn.cross_validation(X, t.reshape(-1, 1), folds, adam, batches, epochs, lambdas[i])
 		scores_list.append(scores)
+		i += 1
 	return scores_list

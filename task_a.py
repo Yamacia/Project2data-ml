@@ -31,12 +31,12 @@ rho2 = 0.99
 momentum = 0.5
 batches = 32
 scheduler_list = [
+    "Adam",
     "Constant",
     "Momentum",
     "Adagrad",
     "AdagradMomentum",
     "RMS_prop",
-    "Adam",
 ]
 
 #best values for every scheduler
