@@ -12,8 +12,8 @@ seed = np.random.seed(4231)
 datapoints = 20
 #Noise param for Franke function, use 0.0 for no noise
 noise = 0.05
-#If True use Franke, if False use Skranke
-use_franke = True
+#If True use Franke, if False use cancer data
+use_franke = False
 #Max polynomial degree
 maxDegree = 8
 #Number of epochs

@@ -5,6 +5,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from autograd import grad
 from sklearn.model_selection import train_test_split
 from FFNN import *
+from sklearn.datasets import load_breast_cancer
 
 
 def FrankeFunction(x,y, noise = 0.0):
@@ -43,17 +44,22 @@ def generate_synth_dataset(use_franke, noise, step, maxDegree):
 	x, y = np.meshgrid(x,y)
 	if use_franke:
 		z = FrankeFunction(x, y, noise)
+		z = np.ravel(z)
+
+		X =	create_X(x, y, maxDegree)
+
+		X_train, X_test, z_train, z_test = train_test_split(X, z, test_size = 0.2)
+
+		z_train = z_train.reshape(z_train.shape[0], 1)
+		z_test = z_test.reshape(z_test.shape[0], 1)
 	else:
-		z = SkrankeFunction(x, y)
-
-	z = np.ravel(z)
-
-	X =	create_X(x, y, maxDegree)
-
-	X_train, X_test, z_train, z_test = train_test_split(X, z, test_size = 0.2)
-
-	z_train = z_train.reshape(z_train.shape[0], 1)
-	z_test = z_test.reshape(z_test.shape[0], 1)
+		#use the cancer data
+		cancer = load_breast_cancer()
+		z  = cancer.target
+		X = cancer.data
+		#Splitting data 4/5 train and 1/5 test, so more data to train than test
+		X_train, X_test, z_train, z_test = train_test_split(X,z,test_size=0.2,random_state=0)
+		z_train = z_train.reshape(-1,1) 
 
 	return x, y, z, X, X_train, X_test, z_train, z_test
 	
