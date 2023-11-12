@@ -42,8 +42,8 @@ scheduler_list = [
 ]
 
 #best values for every scheduler
-best_etas = np.zeros(6)
-best_lambdas = np.zeros(6)
+best_etas = np.zeros(8)
+best_lambdas = np.zeros(8)
 i = 0
 
 for s in scheduler_list:
@@ -53,7 +53,9 @@ for s in scheduler_list:
     plt.xlabel("lambda value")
     plt.ylabel("eta value")
     plt.title(f"{s}, average validation error over {folds} folds")
-    plt.show()
+    results_path = f'{s}_results.png'
+    plt.savefig(results_path)
+    plt.close()
     best_etas[i] = best_eta
     best_lambdas[i] = best_lambda
     i += 1
