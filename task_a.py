@@ -37,6 +37,8 @@ scheduler_list = [
     "Adagrad",
     "AdagradMomentum",
     "RMS_prop",
+    "RMS_propMomentum",
+    "AdamMomentum",
 ]
 
 #best values for every scheduler

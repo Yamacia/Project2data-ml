@@ -107,6 +107,23 @@ class RMS_prop(Scheduler):
     def reset(self):
         self.second = 0.0
 
+class RMS_propMomentum(Scheduler):
+    def __init__(self, eta, rho, momentum):
+        super().__init__(eta)
+        self.rho = rho
+        self.second = 0.0
+        self.momentum = momentum
+        self.change = 0
+
+    def update_change(self, gradient):
+        delta = 1e-8  # avoid division ny zero
+        self.second = self.rho * self.second + (1 - self.rho) * gradient * gradient
+        self.change = self.change * self.momentum + self.eta * gradient / (np.sqrt(self.second + delta))
+        return self.change
+
+    def reset(self):
+        self.second = 0.0
+
 
 class Adam(Scheduler):
     def __init__(self, eta, rho, rho2):
@@ -127,6 +144,34 @@ class Adam(Scheduler):
         second_corrected = self.second / (1 - self.rho2**self.n_epochs)
 
         return self.eta * moment_corrected / (np.sqrt(second_corrected + delta))
+
+    def reset(self):
+        self.n_epochs += 1
+        self.moment = 0
+        self.second = 0
+
+class AdamMomentum(Scheduler):
+    def __init__(self, eta, rho, rho2, momentum):
+        super().__init__(eta)
+        self.rho = rho
+        self.rho2 = rho2
+        self.moment = 0
+        self.second = 0
+        self.n_epochs = 1
+        self.momentum = momentum
+        self.change = 0
+
+    def update_change(self, gradient):
+        delta = 1e-8  # avoid division ny zero
+
+        self.moment = self.rho * self.moment + (1 - self.rho) * gradient
+        self.second = self.rho2 * self.second + (1 - self.rho2) * gradient * gradient
+
+        moment_corrected = self.moment / (1 - self.rho**self.n_epochs)
+        second_corrected = self.second / (1 - self.rho2**self.n_epochs)
+
+        self.change = self.change * self.momentum + self.eta * moment_corrected / (np.sqrt(second_corrected + delta))
+        return self.change
 
     def reset(self):
         self.n_epochs += 1

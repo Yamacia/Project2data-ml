@@ -548,8 +548,12 @@ class FFNN:
                     sched = AdagradMomentum(eta, momentum)
                 elif scheduler == "RMS_prop":
                     sched = RMS_prop(eta, rho)
+                elif scheduler == "RMS_propMomentum":
+                    sched = RMS_propMomentum(eta,rho,momentum)
                 elif scheduler == "Adam":
                     sched = Adam(eta, rho, rho2)
+                elif scheduler == "AdamMomentum":
+                    sched = AdamMomentum(eta,rho,rho2,momentum)
                 scores = self.cross_validation(X, t, folds, sched, batches = batches, epochs = epochs, lam = lam)
                 if self.classification:
                     val_scores = scores["val_accs"]
