@@ -29,11 +29,12 @@ lam = 1e-05
 rho = 0.9
 rho2 = 0.99
 batches = 32
-nodes_in_layer = 16
-layers_to_try = 5
+nodes_in_layer = int(X.shape[1] + 1 / 2)
+layers_to_try = 4
 
 scheduler = Adam(eta, rho, rho2)
-hidden_func = sigmoid
+hidden_func = LRELU
+
 n_layers_scores, layer = optimize_n_hidden_layers(X_train, z_train, folds, scheduler, batches, epochs, lam, nodes_in_layer, layers_to_try, hidden_func)
 
 
@@ -57,10 +58,10 @@ for i in range(len(n_layers_scores)):
         best_layer_length = len(layer[i])
 
 #Try powers of two in nodes
-nodes_to_try = np.power(2, np.arange(8))
+nodes_to_try = np.power(2, np.arange(7))
+#add the number of nodes we initially tested with
+nodes_to_try = np.insert(nodes_to_try, 6, nodes_in_layer)
 
-#Try linspace from 30 to 65
-#nodes_to_try = np.array([30, 35, 40, 45, 50, 55, 65])
 n_nodes_scores, node_layer = optimize_n_nodes(X_train, z_train, folds, scheduler, batches, epochs, lam, best_layer_length, nodes_to_try, hidden_func)
 
 for i in range(len(n_nodes_scores)):
@@ -72,7 +73,7 @@ plt.ylabel("MSE")
 plt.show()
 
 """
-Hidden layer for RELU: (16,16,16)
-Hidden layer for RELU: (8,8,8)
-Hidden layer for sigmoid: (8,8,8)
+Hidden layer for LRELU: (64, 64)
+Hidden layer for RELU: (45, 45, 45, 45)
+Hidden layer for sigmoid: (64, 64, 64, 64)
 """

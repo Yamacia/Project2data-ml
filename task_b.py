@@ -27,16 +27,16 @@ rho = 0.9
 rho2 = 0.99
 momentum = 0.5
 batches = 32
-#hidden layer configuration gotten from optimize_nodes.py
-adam = Adam(eta = 0.001 , rho = rho, rho2 = rho2)
-hidden_layer_sizes = (8,8,8)
+#hidden layer configuration gotten from optimize_nodes.py and optimize_hidden_func_adam.py
+adam = Adam(eta = 0.0001 , rho = rho, rho2 = rho2)
+hidden_layer_sizes = (64, 64, 64, 64)
 output_layer_size = 1
 
 mlp_regressor = MLPRegressor(
     hidden_layer_sizes=hidden_layer_sizes,
     activation='logistic',
     solver='adam',
-    max_iter=500,  # Increase the number of iterations
+    max_iter=1000,
     alpha=0.001,
     random_state=4231,
     batch_size = X_train.shape[0] // 30,

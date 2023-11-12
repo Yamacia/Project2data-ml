@@ -30,7 +30,6 @@ batches = 32
 rho = 0.9
 rho2 = 0.99
 momentum = 0.5
-batches = 32
 
 
 hidden_funcs = [
@@ -39,21 +38,21 @@ hidden_funcs = [
     LRELU]
 
 hidden_layers = [
-    (8,8,8),
-    (16,16,16),
-    (8,8,8)
+    (64, 64, 64, 64),
+    (45, 45, 45, 45),
+    (64, 64)
 ]
 
 lambdas = [
     1e-05,
-    0.001,
-    0.001
+    0.0001,
+    1e-05
 ]
 
 etas = [
+    0.0001,
     0.01,
-    0.001,
-    0.001
+    0.01
 ]
 
 func_string = [

@@ -30,14 +30,15 @@ rho = 0.9
 rho2 = 0.99
 momentum = 0.5
 batches = 32
-
+#One hidden layer with nodes based on input layer
+hidden_layer = int(X.shape[1] + 1 / 2)
 
 hidden_funcs = [sigmoid, RELU, LRELU]
 
 scheduler = "Adam"
 
 for func in hidden_funcs:
-    ffnn = FFNN(dimensions=(X.shape[1], 1), hidden_func=func, seed=4231, output_func= lambda x: x)
+    ffnn = FFNN(dimensions=(X.shape[1], hidden_layer, 1), hidden_func=func, seed=4231, output_func= lambda x: x)
     heatmap, best_eta, best_lambda = ffnn.optimze_params(X_train, z_train, etas, lambdas, scheduler, batches = batches, epochs = epochs, momentum=momentum, rho=rho, rho2=rho2, folds = folds)
     print(f"\n Best eta for {scheduler} with {func}: {best_eta}, Best lambda: {best_lambda}")
     ax = sns.heatmap(heatmap, xticklabels=lambdas, yticklabels=etas, annot=True, fmt = ".4f", cmap='viridis_r')
@@ -45,3 +46,10 @@ for func in hidden_funcs:
     plt.ylabel("eta value")
     plt.title(f"{scheduler}, average validation error over {folds} folds using activation function: {func}")
     plt.show()
+
+    """
+|func        |eta    |lambda   |mse   |
+|sigmoid     |0.0001 |1e-5/0.0 |0.0080|
+|RELU        |0.01   |0.0001   |0.0056|
+|LRELU       |0.01   |1e-5     |0.0062|
+"""
