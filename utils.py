@@ -59,7 +59,10 @@ def generate_synth_dataset(use_franke, noise, step, maxDegree):
 		X = cancer.data
 		#Splitting data 4/5 train and 1/5 test, so more data to train than test
 		X_train, X_test, z_train, z_test = train_test_split(X,z,test_size=0.2,random_state=0)
+		
+		z = z.reshape(-1,1)
 		z_train = z_train.reshape(-1,1) 
+		z_test = z_test.reshape(-1,1)
 
 	return x, y, z, X, X_train, X_test, z_train, z_test
 	

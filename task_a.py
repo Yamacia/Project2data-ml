@@ -13,7 +13,7 @@ datapoints = 20
 #Noise param for Franke function, use 0.0 for no noise
 noise = 0.05
 #If True use Franke, if False use cancer data
-use_franke = False
+use_franke = True
 #Max polynomial degree
 maxDegree = 8
 #Number of epochs
@@ -52,8 +52,9 @@ for s in scheduler_list:
     ax = sns.heatmap(heatmap, xticklabels=lambdas, yticklabels=etas, annot=True, fmt = ".4f", cmap='viridis_r')
     plt.xlabel("lambda value")
     plt.ylabel("eta value")
-    plt.title(f"{s}, average validation error over {folds} folds")
-    results_path = f'{s}_results.png'
+    type = "accuracy" if ffnn.classification else "score"
+    plt.title(f"{s}, average validation {type} over {folds} folds")
+    results_path = f'{s}_results_franke.png'
     plt.savefig(results_path)
     plt.close()
     best_etas[i] = best_eta
