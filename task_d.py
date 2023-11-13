@@ -32,13 +32,13 @@ momentum = 0.5
 batches = 32
 scheduler_list = [
     "Adam",
-    # "Constant",
-    # "Momentum",
-    # "Adagrad",
-    # "AdagradMomentum",
-    # "RMS_prop",
-    # "RMS_propMomentum",
-    # "AdamMomentum",
+    "Constant",
+    "Momentum",
+    "Adagrad",
+    "AdagradMomentum",
+    "RMS_prop",
+    "RMS_propMomentum",
+    "AdamMomentum",
 ]
 
 #best values for every scheduler
