@@ -35,7 +35,7 @@ hidden_layer = int(X.shape[1] + 1 / 2)
 
 hidden_funcs = [sigmoid, RELU, LRELU]
 
-scheduler = "Adam"
+scheduler = "AdagradMomentum"
 
 for func in hidden_funcs:
     ffnn = FFNN(dimensions=(X.shape[1], hidden_layer, 1), hidden_func=func, seed=4231, output_func= lambda x: x)
@@ -47,9 +47,17 @@ for func in hidden_funcs:
     plt.title(f"{scheduler}, average validation error over {folds} folds using activation function: {func}")
     plt.show()
 
-    """
+"""
+Adam:
+
 |func        |eta    |lambda   |mse   |
 |sigmoid     |0.0001 |1e-5/0.0 |0.0080|
 |RELU        |0.01   |0.0001   |0.0056|
 |LRELU       |0.01   |1e-5     |0.0062|
+
+AdagradMomentum:
+|func        |eta    |lambda   |mse   |
+|sigmoid     |0.01   |1e-5     |0.0086|
+|RELU        |0.01   |0.01     |0.0178|
+|LRELU       |0.01   |1.01     |0.0178|
 """
