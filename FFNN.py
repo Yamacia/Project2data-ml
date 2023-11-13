@@ -502,16 +502,26 @@ class FFNN:
             cv.append((X_train_fold_scaled, t_train_fold, X_val_fold_scaled, t_val_fold))
 
         cv_scores = None
-
+        if self.classification:
+            confusion_matrix = np.zeros((2, 2))
+        else:
+            confusion_matrix = None
         for X_train, t_train, X_val, t_val in cv:
             self.reset_weights()
             scaled_batches = max(int(batches / (X.shape[0] / X_train.shape[0])), 1)
             scores = self.fit(X_train, t_train, scheduler, scaled_batches, epochs, lam, X_val, t_val)
             
+            if self.classification:
+                confusion = self.calc_confusion(t_val, self.predict(X_val))
+                confusion_matrix += confusion / folds
             if cv_scores is None:
                 cv_scores = {key: value / folds for key, value in scores.items()}
             else:
                 cv_scores = {key: cv_scores[key] + value / folds for key, value in scores.items()}
+
+        if self.classification:
+            cv_scores["confusion_matrix"] = confusion_matrix
+
         return cv_scores
     
 
@@ -571,3 +581,25 @@ class FFNN:
 
         return(heatmap, best_eta, best_lambda)
     
+    def calculate_rate(self, true_count, false_count):
+        if true_count + false_count > 0:
+            true_rate = true_count / (true_count + false_count)
+            false_rate = false_count / (true_count + false_count)
+        else:
+            true_rate, false_rate = 0, 0
+        return true_rate, false_rate
+
+    def calc_confusion(self, t, pred):
+        t = np.where(t, True, False)
+        pred = np.where(pred, True, False)
+        true_positive = np.sum(t * pred)
+        true_negative = np.sum(np.bitwise_not(t) * np.bitwise_not(pred))
+        false_positive = np.sum(np.bitwise_not(t) * pred)
+        false_negative = np.sum(t * np.bitwise_not(pred))
+
+        true_positive_rate, false_positive_rate = self.calculate_rate(true_positive, false_positive)
+
+        true_negative_rate, false_negative_rate = self.calculate_rate(true_negative, false_negative)
+
+        confusion_matrix = np.array([[true_negative_rate, false_negative_rate], [false_positive_rate, true_positive_rate]])
+        return confusion_matrix

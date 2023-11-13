@@ -22,7 +22,7 @@ epochs = 200
 #Number of folds for cross validation
 folds = 5
 #Generates either Skranke or Franke dataset
-x, y, z, X, X_train, X_test, z_train, z_test = generate_synth_dataset(use_franke, noise, 1 / datapoints, maxDegree)
+x, y, z, X, X_train, X_test, z_train, z_test = generate_dataset(use_franke, noise, 1 / datapoints, maxDegree)
 rho = 0.9
 rho2 = 0.99
 momentum = 0.5

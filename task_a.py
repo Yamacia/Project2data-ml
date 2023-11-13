@@ -21,7 +21,7 @@ epochs = 500
 #Number of folds for cross validation
 folds = 5
 #Generates either Skranke or Franke dataset
-x, y, z, X, X_train, X_test, z_train, z_test = generate_synth_dataset(use_franke, noise, 1 / datapoints, maxDegree)
+x, y, z, X, X_train, X_test, z_train, z_test = generate_dataset(use_franke, noise, 1 / datapoints, maxDegree)
 ffnn = FFNN((X.shape[1], 1), seed = seed)
 etas = np.logspace(-4, -1, 4)
 lambdas = np.logspace(-5, -1, 5)
@@ -71,5 +71,4 @@ for s in scheduler_list:
 |RMS prop       |0.01|1e'5        |0.0174|
 |Adam           |0.01|0.001       |0.0167|
 """
-
 

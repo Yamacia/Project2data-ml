@@ -5,6 +5,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from autograd import grad
 from sklearn.model_selection import train_test_split
 from FFNN import *
+from schedulers import *
 from sklearn.datasets import load_breast_cancer
 
 
@@ -38,7 +39,7 @@ def create_X(x, y, n ):
 
 	return X
 
-def generate_synth_dataset(use_franke, noise, step, maxDegree):
+def generate_dataset(use_franke, noise, step, maxDegree):
 	x = np.arange(0, 1, step)
 	y = np.arange(0, 1, step)
 	x, y = np.meshgrid(x,y)
@@ -66,24 +67,24 @@ def generate_synth_dataset(use_franke, noise, step, maxDegree):
 
 	return x, y, z, X, X_train, X_test, z_train, z_test
 	
-def optimize_n_hidden_layers(X, t, folds, scheduler, batches, epochs, lam, n_nodes, max_layers, hidden_func):
+def optimize_n_hidden_layers(X, t, folds, scheduler, batches, epochs, lam, n_nodes, max_layers, hidden_func = sigmoid, output_func = lambda x :x, cost_func = CostOLS):
 	scores_list = []
 	attempted_layers = []
 	for i in range(1, max_layers + 1):
 		hidden_layer = (n_nodes,) * i
-		ffnn = FFNN(dimensions=(X.shape[1], *hidden_layer, 1), hidden_func=hidden_func, seed=4231, output_func= lambda x: x)
+		ffnn = FFNN(dimensions=(X.shape[1], *hidden_layer, 1), hidden_func=hidden_func, seed=4231, output_func= output_func, cost_func= cost_func)
 		scores = ffnn.cross_validation(X, t, folds, scheduler, batches, epochs, lam)
 		scores_list.append(scores)
 		attempted_layers.append(hidden_layer)
 		print(f"\n Hidden layer: {hidden_layer}")
 	return scores_list, attempted_layers
 
-def optimize_n_nodes(X, t, folds, scheduler, batches, epochs, lam, hidden_layers, n_nodes, hidden_func):
+def optimize_n_nodes(X, t, folds, scheduler, batches, epochs, lam, hidden_layers, n_nodes, hidden_func = sigmoid, output_func = lambda x :x, cost_func = CostOLS):
 	scores_list = []
 	attempted_layers = []
 	for nodes in (n_nodes):
 		hidden_layer = (nodes,) * hidden_layers
-		ffnn = FFNN(dimensions=(X.shape[1], *hidden_layer, 1), hidden_func=hidden_func, seed=4231, output_func= lambda x: x)
+		ffnn = FFNN(dimensions=(X.shape[1], *hidden_layer, 1), hidden_func=hidden_func, seed=4231, output_func= output_func, cost_func=cost_func)
 		scores = ffnn.cross_validation(X, t, folds, scheduler, batches, epochs, lam)
 		scores_list.append(scores)
 		attempted_layers.append(hidden_layer)
@@ -100,3 +101,6 @@ def run_funcs(X, t, folds, batches, epochs, etas, lambdas, hidden_layers, hidden
 		scores_list.append(scores)
 		i += 1
 	return scores_list
+
+
+

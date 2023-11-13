@@ -1,6 +1,7 @@
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.datasets import load_breast_cancer
 
 from schedulers import *
 from FFNN import *
@@ -11,7 +12,7 @@ seed = np.random.seed(4231)
 #Number of datapoints to generate for
 datapoints = 20
 #Noise param for Franke function, use 0.0 for no noise
-noise = 0.05
+noise = 0.0
 #If True use Franke, if False use cancer data
 use_franke = False
 #Max polynomial degree
@@ -20,56 +21,28 @@ maxDegree = 8
 epochs = 500
 #Number of folds for cross validation
 folds = 5
-#Generates either Skranke or Franke dataset
-x, y, z, X, X_train, X_test, z_train, z_test = generate_synth_dataset(use_franke, noise, 1 / datapoints, maxDegree)
-ffnn = FFNN((X.shape[1], 1), seed = seed, cost_func=CostCrossEntropy, output_func=sigmoid)
-etas = np.logspace(-4, -1, 4)
-lambdas = np.logspace(-5, -1, 5)
-lambdas = np.insert(lambdas, 0, 0)
+x, y, z, X, X_train, X_test, z_train, z_test = generate_dataset(use_franke, noise, 1 / datapoints, maxDegree)
+
+hidden_layer = (64, 64, 64, 64)
+eta = 0.0001
+lam = 1e-05
 rho = 0.9
 rho2 = 0.99
 momentum = 0.5
 batches = 32
-scheduler_list = [
-    "Adam",
-    "Constant",
-    "Momentum",
-    "Adagrad",
-    "AdagradMomentum",
-    "RMS_prop",
-    "RMS_propMomentum",
-    "AdamMomentum",
-]
-
+scheduler = Adam(eta = eta, rho = rho, rho2 = rho2)
 #best values for every scheduler
-best_etas = np.zeros(8)
-best_lambdas = np.zeros(8)
-i = 0
+ffnn = FFNN((X.shape[1], *hidden_layer, 1), seed = seed, cost_func=CostLogReg, output_func=sigmoid, hidden_func=sigmoid)
 
-for s in scheduler_list:
-    heatmap, best_eta, best_lambda = ffnn.optimze_params(X_train, z_train, etas, lambdas, s, batches = batches, epochs = epochs, momentum=momentum, rho=rho, rho2=rho2, folds = folds)
-    print(f"\n Best eta for {s}: {best_eta}, Best lambda: {best_lambda}")
-    ax = sns.heatmap(heatmap, xticklabels=lambdas, yticklabels=etas, annot=True, fmt = ".4f", cmap='viridis_r')
-    plt.xlabel("lambda value")
-    plt.ylabel("eta value")
-    type = "accuracy" if ffnn.classification else "score"
-    plt.title(f"{s}, average validation {type} over {folds} folds")
-    results_path = f'{s}_results_cancer.png'
-    plt.savefig(results_path)
-    plt.close()
-    best_etas[i] = best_eta
-    best_lambdas[i] = best_lambda
-    i += 1
+scores = ffnn.cross_validation(X, z, folds, scheduler, batches, epochs, lam)
 
-
-"""
-|Scheduler      |eta |lambda      |mse   |
-|Constant       |0.1 |1e-5/0.00001|0.0146|
-|Momentum       |0.1 |1e-5        |0.0105|
-|Adagrad        |0.1 |0.01        |0.0264|
-|AdagradMomentum|0.1 |0.001       |0.0165|
-|RMS prop       |0.01|1e'5        |0.0174|
-|Adam           |0.01|0.001       |0.0167|
-"""
-
+sns.heatmap(scores["confusion_matrix"], annot=True, fmt = ".3%",  cmap='Greens')
+plt.title("Confusion matrix of breast cancer dataset after ffnn fitting")
+plt.xlabel("Predicted")
+plt.ylabel("True")
+plt.text(0.5, 0.2, "True Negative", horizontalalignment='center', verticalalignment='center', fontsize=12, color='black')
+plt.text(0.5, 1.2, "False Positive", horizontalalignment='center', verticalalignment='center', fontsize=12, color='black')
+plt.text(1.5, 0.2, "False Negative", horizontalalignment='center', verticalalignment='center', fontsize=12, color='black')
+plt.text(1.5, 1.2, "True Positive", horizontalalignment='center', verticalalignment='center', fontsize=12, color='black')
+plt.show()
 
