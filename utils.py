@@ -102,5 +102,27 @@ def run_funcs(X, t, folds, batches, epochs, etas, lambdas, hidden_layers, hidden
 		i += 1
 	return scores_list
 
+def calculate_rate(true_count, false_count):
+    if true_count + false_count > 0:
+        true_rate = true_count / (true_count + false_count)
+        false_rate = false_count / (true_count + false_count)
+    else:
+        true_rate, false_rate = 0, 0
+    return true_rate, false_rate
 
+def calc_confusion(t, pred):
+    t = np.where(t, True, False)
+    pred = np.where(pred, True, False)
+    # print(np.ravel(t))
+    # print(pred)
+    true_positive = np.sum(t * pred)
+    true_negative = np.sum(np.bitwise_not(t) * np.bitwise_not(pred))
+    false_positive = np.sum(np.bitwise_not(t) * pred)
+    false_negative = np.sum(t * np.bitwise_not(pred))
 
+    true_positive_rate, false_positive_rate = calculate_rate(true_positive, false_positive)
+
+    true_negative_rate, false_negative_rate = calculate_rate(true_negative, false_negative)
+
+    confusion_matrix = np.array([[true_negative_rate, false_negative_rate], [false_positive_rate, true_positive_rate]])
+    return confusion_matrix
