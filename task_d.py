@@ -65,7 +65,7 @@ dnn = MLPClassifier(solver = "adam", hidden_layer_sizes=64, activation='logistic
 confusion = 0
 confusion_matrix = np.zeros((2, 2))
 
-for train_index, test_index in kf.split(X):
+for train_index, test_index in kf.split(X_scaled):
     dnn.fit(X_scaled[train_index],np.ravel(z[train_index]))
     print()
     print("Accuracy Score (training): ", dnn.score(X_scaled[train_index],z[train_index]))

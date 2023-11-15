@@ -42,7 +42,7 @@ class FFNN:
         dimensions: Tuple[int],
         hidden_func: Callable = sigmoid,
         output_func: Callable = lambda x: x,
-        cost_func: Callable = CostLogReg,
+        cost_func: Callable = CostOLS,
         seed: int = None):
         
         self.dimensions = dimensions
@@ -509,7 +509,6 @@ class FFNN:
         for X_train, t_train, X_val, t_val in cv:
             self.reset_weights()
             scaled_batches = max(int(batches / (X.shape[0] / X_train.shape[0])), 1)
-            print(X_train)
             scores = self.fit(X_train, t_train, scheduler, scaled_batches, epochs, lam, X_val, t_val)
             
             if self.classification:

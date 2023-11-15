@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold
 
 import warnings
 from sklearn.exceptions import ConvergenceWarning
@@ -73,21 +74,21 @@ for s in scheduler_list:
     # best_lambdas[i] = best_lambda
     # i += 1
 
-    for i, eta in enumerate(etas):
+    for k, eta in enumerate(etas):
         for j, lmbd in enumerate(lambdas):
             dnn = MLPRegressor(solver = "sgd", hidden_layer_sizes=64, activation='logistic',
                                 alpha=lmbd, learning_rate_init=eta, max_iter=epochs)
             dnn.fit(X_train_scaled, np.ravel(z_train))
             zpredict_train = dnn.predict(X_train_scaled)
-            DNN_scikit[i][j] = dnn
+            DNN_scikit[k][j] = dnn
 
     sns.set_theme()
     test_accuracy = np.zeros((len(etas), len(lambdas)))
-    for i in range(len(etas)):
+    for k in range(len(etas)):
         for j in range(len(lambdas)):
-            dnn = DNN_scikit[i][j]
+            dnn = DNN_scikit[k][j]
             zpredict_test = dnn.predict(X_test_scaled)
-            test_accuracy[i][j] = (1.0 / z_test.shape[0]) * np.sum((np.ravel(z_test) - zpredict_test) ** 2)
+            test_accuracy[k][j] = (1.0 / z_test.shape[0]) * np.sum((np.ravel(z_test) - zpredict_test) ** 2)
 
     fig, ax = plt.subplots(figsize = (10, 10))
     sns.heatmap(test_accuracy, xticklabels=lambdas, yticklabels=etas, annot=True, ax=ax, fmt = ".4f", cmap="viridis_r")
@@ -95,6 +96,32 @@ for s in scheduler_list:
     ax.set_ylabel(r"$\eta$")
     ax.set_xlabel(r"$\lambda$")
     plt.show()  
+
+    # kf = KFold(n_splits = folds)
+    # test_accuracy = np.zeros((len(etas), len(lambdas)))
+
+    # for train_index, test_index in kf.split(X_scaled):
+    #     for k, eta in enumerate(etas):
+    #         for j, lmbd in enumerate(lambdas):
+    #                 dnn = MLPRegressor(solver = "sgd", hidden_layer_sizes=64, activation='logistic',
+    #                                     alpha=lmbd, learning_rate_init=eta, max_iter=epochs)
+    #                 dnn.fit(X_scaled[train_index], np.ravel(z[train_index]))
+    #                 zpredict_train = dnn.predict(X_scaled[train_index])
+    #                 DNN_scikit[k][j] = dnn
+        
+    #     sns.set_theme()
+    #     for k in range(len(etas)):
+    #         for j in range(len(lambdas)):
+    #             dnn = DNN_scikit[k][j]
+    #             zpredict_test = dnn.predict(X[test_index])
+    #             test_accuracy[k][j] += (1.0 / z_test.shape[0]) * np.sum((np.ravel(z_test) - zpredict_test) ** 2) / folds
+
+    # fig, ax = plt.subplots(figsize = (10, 10))
+    # sns.heatmap(test_accuracy, xticklabels=lambdas, yticklabels=etas, annot=True, ax=ax, fmt = ".4f", cmap="viridis_r")
+    # ax.set_title("Test Accuracy")
+    # ax.set_ylabel(r"$\eta$")
+    # ax.set_xlabel(r"$\lambda$")
+    # plt.show()  
 
 
 """
