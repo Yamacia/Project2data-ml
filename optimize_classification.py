@@ -23,9 +23,8 @@ folds = 5
 #Generates either Skranke or Franke dataset
 x, y, z, X, X_train, X_test, z_train, z_test = generate_dataset(use_franke, noise, 1 / datapoints, maxDegree)
 
-etas = np.logspace(-4, -1, 4)
-lambdas = np.logspace(-5, -1, 5)
-lambdas = np.insert(lambdas, 0, 0)
+etas = np.logspace(-4, -2, 3)
+lambdas = np.logspace(-5, -2, 4)
 rho = 0.9
 rho2 = 0.99
 momentum = 0.5
@@ -33,7 +32,7 @@ batches = 32
 #One hidden layer with nodes based on input layer
 hidden_layer = int(X.shape[1] + 1 / 2)
 
-hidden_funcs = [sigmoid]
+hidden_funcs = [sigmoid, RELU, LRELU]
 
 scheduler = "Adam"
 
