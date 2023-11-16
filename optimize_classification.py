@@ -15,7 +15,7 @@ seed = np.random.seed(4231)
 datapoints = 20
 #Noise param for Franke function, use 0.0 for no noise
 noise = 0.00
-#If True use Franke, if False use Skranke
+#If True use Franke, if False use Cancer dataset
 use_franke = False
 #Max polynomial degree
 maxDegree = 8
@@ -23,7 +23,7 @@ maxDegree = 8
 epochs = 500
 #Number of folds for cross validation
 folds = 5
-#Generates either Skranke or Franke dataset
+
 x, y, z, X, X_train, X_test, z_train, z_test = generate_dataset(use_franke, noise, 1 / datapoints, maxDegree)
 
 etas = np.logspace(-4, -2, 3)
