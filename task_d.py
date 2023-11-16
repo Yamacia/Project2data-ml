@@ -29,7 +29,7 @@ epochs = 500
 folds = 5
 x, y, z, X, X_train, X_test, z_train, z_test = generate_dataset(use_franke, noise, 1 / datapoints, maxDegree)
 
-hidden_layer = (64, 64, 64, 64)
+hidden_layer = (78, 78, 78, 78)
 eta = 0.0001
 lam = 1e-05
 rho = 0.9
@@ -38,7 +38,7 @@ momentum = 0.5
 batches = 32
 scheduler = Adam(eta = eta, rho = rho, rho2 = rho2)
 #best values for every scheduler
-ffnn = FFNN((X.shape[1], *hidden_layer, 1), seed = seed, cost_func=CostLogReg, output_func=sigmoid, hidden_func=sigmoid)
+ffnn = FFNN((X.shape[1], 1), seed = seed, cost_func=CostLogReg, output_func=sigmoid, hidden_func=sigmoid)
 
 # scores = ffnn.cross_validation(X, z, folds, scheduler, batches, epochs, lam)
 
@@ -59,7 +59,7 @@ X_scaled = min_max_scaler.fit_transform(X)
 
 kf = KFold(n_splits = folds)
 
-dnn = MLPClassifier(solver = "adam", hidden_layer_sizes=(78,78,78,78), activation='logistic',
+dnn = MLPClassifier(solver = "adam", hidden_layer_sizes=1, activation='logistic',
                     alpha=lam, learning_rate_init=eta, max_iter=epochs, batch_size= batches, momentum=momentum)
 
 confusion = 0

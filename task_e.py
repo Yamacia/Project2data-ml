@@ -124,15 +124,32 @@ X_test_scaled = min_max_scaler.transform(X_test)
 # dnn.predict(X_test_scaled)
 # print(dnn.score(X_test_scaled, np.ravel(z_test)))
 
-# Build logistic regression model with a custom learning rate and L2 regularization
-model = tf.keras.Sequential([
-    tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=tf.keras.regularizers.l2(0.1))
+# Tensorflow Keras equivalent
+for k, eta in enumerate(etas):
+    for j, lmbd in enumerate(lambdas):
+        dnn = tf.keras.Sequential([
+    tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=tf.keras.regularizers.l2(lmbd))
 ])
+        # Compile the model with a custom optimizer
+        custom_optimizer = tf.keras.optimizers.SGD(learning_rate=eta)
+        dnn.compile(optimizer=custom_optimizer, loss='binary_crossentropy', metrics=['accuracy'])
 
-# Compile the model with a custom optimizer
-custom_optimizer = tf.keras.optimizers.SGD(learning_rate=0.0)
-model.compile(optimizer=custom_optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+        # Train the model
+        dnn.fit(X_train_scaled, z_train, epochs=epochs, batch_size=batches)
+        DNN_scikit[k][j] = dnn
 
-# Train the model
-model.fit(X_train_scaled, z_train, epochs=50, batch_size=batches, validation_data=(X_test_scaled, z_test))
-print(model.evaluate)
+sns.set_theme()
+test_accuracy = np.zeros((len(etas), len(lambdas)))
+
+for k in range(len(etas)):
+    for j in range (len(lambdas)):
+        dnn = DNN_scikit[k][j]
+        eval = dnn.evaluate(X_test_scaled, z_test)
+        test_accuracy[k][j] = eval[1]
+
+fig, ax = plt.subplots(figsize = (10, 10))
+sns.heatmap(test_accuracy, xticklabels=lambdas, yticklabels=etas, annot=True, ax=ax, fmt = ".4f", cmap="viridis_r")
+ax.set_title("Test Accuracy using Tensorflow Keras")
+ax.set_ylabel(r"$\eta$")
+ax.set_xlabel(r"$\lambda$")
+plt.show()  
