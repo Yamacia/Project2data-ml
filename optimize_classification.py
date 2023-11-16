@@ -6,6 +6,9 @@ from schedulers import *
 from FFNN import *
 from utils import *
 
+"""
+This script finds the optimal parameters for the classification case, by trying different parameters and activation functions in the hidden layer for Adam GD
+"""
 seed = np.random.seed(4231)
 
 #Number of datapoints to generate for
@@ -45,10 +48,3 @@ for func in hidden_funcs:
     plt.ylabel("eta value")
     plt.title(f"{scheduler}, average validation error over {folds} folds using activation function: {func}")
     plt.show()
-
-"""
-Adam:
-
-|func        |eta    |lambda   |acc   |
-|sigmoid     |0.001  |0.001    |0.9846|
-"""
