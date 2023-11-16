@@ -7,14 +7,16 @@ from sklearn.neural_network import MLPRegressor
 from schedulers import *
 from FFNN import *
 from utils import *
-
+"""
+This script tunes the hidden layer architecture for given parameters
+"""
 seed = np.random.seed(4231)
 
 #Number of datapoints to generate for
 datapoints = 20
 #Noise param for Franke function, use 0.0 for no noise
 noise = 0.05
-#If True use Franke, if False use Skranke
+#If True use Franke, if False use cancer dataset
 use_franke = False
 #Max polynomial degree
 maxDegree = 8
@@ -22,7 +24,7 @@ maxDegree = 8
 epochs = 500
 #Number of folds for cross validation
 folds = 5
-#Generates either Skranke or Franke dataset
+
 x, y, z, X, X_train, X_test, z_train, z_test = generate_dataset(use_franke, noise, 1 / datapoints, maxDegree)
 eta = 0.0001
 lam = 1e-05
@@ -30,10 +32,14 @@ rho = 0.9
 rho2 = 0.99
 batches = 32
 
+adam = Adam(eta, rho, rho2)
+
 starting_layer = [64, 64, 64, 64]
 try_nodes = [50, 64, 78, 92]
-adam = Adam(eta, rho, rho2)
+
+
 best_accuracy = 0
+
 for i in range(len(starting_layer)):
     curr_scores = np.zeros(len(try_nodes))
     
