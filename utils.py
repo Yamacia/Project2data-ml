@@ -111,18 +111,18 @@ def calculate_rate(true_count, false_count):
     return true_rate, false_rate
 
 def calc_confusion(t, pred):
-    t = np.where(t, True, False)
-    pred = np.where(pred, True, False)
-    # print(np.ravel(t))
-    # print(pred)
-    true_positive = np.sum(t * pred)
-    true_negative = np.sum(np.bitwise_not(t) * np.bitwise_not(pred))
-    false_positive = np.sum(np.bitwise_not(t) * pred)
-    false_negative = np.sum(t * np.bitwise_not(pred))
+	t = np.where(t, True, False)
+	pred = np.where(pred, True, False)
+	# print(np.ravel(t))
+	# print(pred)
+	true_positive = np.sum(t * pred)
+	true_negative = np.sum(np.bitwise_not(t) * np.bitwise_not(pred))
+	false_positive = np.sum(np.bitwise_not(t) * pred)
+	false_negative = np.sum(t * np.bitwise_not(pred))
 
-    true_positive_rate, false_positive_rate = calculate_rate(true_positive, false_positive)
+	true_positive_rate, false_positive_rate = calculate_rate(true_positive, false_positive)
 
-    true_negative_rate, false_negative_rate = calculate_rate(true_negative, false_negative)
+	true_negative_rate, false_negative_rate = calculate_rate(true_negative, false_negative)
 
-    confusion_matrix = np.array([[true_negative_rate, false_negative_rate], [false_positive_rate, true_positive_rate]])
-    return confusion_matrix
+	confusion_matrix = np.array([[true_negative_rate, false_negative_rate], [false_positive_rate, true_positive_rate]])
+	return confusion_matrix

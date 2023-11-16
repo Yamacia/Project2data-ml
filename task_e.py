@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import KFold
+from sklearn.linear_model import LogisticRegression
+import tensorflow as tf
 
 import warnings
 from sklearn.exceptions import ConvergenceWarning
@@ -66,43 +68,43 @@ X_test_scaled = min_max_scaler.transform(X_test)
 # best_lambdas[i] = best_lambda
 # i += 1
 
-for k, eta in enumerate(etas):
-    for j, lmbd in enumerate(lambdas):
-        print(f"{eta} and {lmbd}")
-        dnn = MLPClassifier(solver = "sgd", hidden_layer_sizes=64, activation='logistic',
-                            alpha=lmbd, learning_rate_init=eta, max_iter=epochs)
-        dnn.fit(X_train_scaled, np.ravel(z_train))
-        zpredict_train = dnn.predict(X_train_scaled)
-        print(np.average((zpredict_train == np.ravel(z_train))))
-        DNN_scikit[k][j] = dnn
+# Usual train_test_split equivalent
+# for k, eta in enumerate(etas):
+#     for j, lmbd in enumerate(lambdas):
+#         dnn = MLPClassifier(solver = "sgd", hidden_layer_sizes=64, activation='logistic',
+#                             alpha=lmbd, learning_rate_init=eta, max_iter=epochs, batch_size= batches, momentum= momentum)
+#         dnn.fit(X_train_scaled, np.ravel(z_train))
+#         zpredict_train = dnn.predict(X_train_scaled)
+#         DNN_scikit[k][j] = dnn
 
-sns.set_theme()
-test_accuracy = np.zeros((len(etas), len(lambdas)))
-for k in range(len(etas)):
-    for j in range(len(lambdas)):
-        dnn = DNN_scikit[k][j]
-        zpredict_test = dnn.predict(X_test_scaled)
-        test_accuracy[k][j] = np.average((zpredict_test == np.ravel(z_test)))
+# sns.set_theme()
+# test_accuracy = np.zeros((len(etas), len(lambdas)))
+# for k in range(len(etas)):
+#     for j in range(len(lambdas)):
+#         dnn = DNN_scikit[k][j]
+#         zpredict_test = dnn.predict(X_test_scaled)
+#         test_accuracy[k][j] = np.average((zpredict_test == np.ravel(z_test)))
 
-fig, ax = plt.subplots(figsize = (10, 10))
-sns.heatmap(test_accuracy, xticklabels=lambdas, yticklabels=etas, annot=True, ax=ax, fmt = ".4f", cmap="viridis_r")
-ax.set_title("Test Accuracy")
-ax.set_ylabel(r"$\eta$")
-ax.set_xlabel(r"$\lambda$")
-plt.show()  
+# fig, ax = plt.subplots(figsize = (10, 10))
+# sns.heatmap(test_accuracy, xticklabels=lambdas, yticklabels=etas, annot=True, ax=ax, fmt = ".4f", cmap="viridis_r")
+# ax.set_title("Test Accuracy")
+# ax.set_ylabel(r"$\eta$")
+# ax.set_xlabel(r"$\lambda$")
+# plt.show()  
 
+# KFold Cross Validation equivalent
 # kf = KFold(n_splits = folds)
 # test_accuracy = np.zeros((len(etas), len(lambdas)))
 
 # for train_index, test_index in kf.split(X_scaled):
 #     for k, eta in enumerate(etas):
 #         for j, lmbd in enumerate(lambdas):
-#                 dnn = MLPClassifier(solver = "sgd", hidden_layer_sizes=64, activation='logistic',
-#                                     alpha=lmbd, learning_rate_init=eta, max_iter=epochs)
-#                 dnn.fit(X_scaled[train_index], np.ravel(z[train_index]))
-#                 zpredict_train = dnn.predict(X_scaled[train_index])
-#                 # print(np.average((zpredict_train == np.ravel(z_train))))
-#                 DNN_scikit[k][j] = dnn
+#             dnn = MLPClassifier(solver = "sgd", hidden_layer_sizes=64, activation='logistic',
+#                                 alpha=lmbd, learning_rate_init=eta, max_iter=epochs, batch_size= batches, momentum= momentum)
+#             dnn.fit(X_scaled[train_index], np.ravel(z[train_index]))
+#             zpredict_train = dnn.predict(X_scaled[train_index])
+#             # print(np.average((zpredict_train == np.ravel(z_train))))
+#             DNN_scikit[k][j] = dnn
     
 #     sns.set_theme()
 #     for k in range(len(etas)):
@@ -118,14 +120,19 @@ plt.show()
 # ax.set_xlabel(r"$\lambda$")
 # plt.show()  
 
+# dnn = LogisticRegression().fit(X_train_scaled, np.ravel(z_train))
+# dnn.predict(X_test_scaled)
+# print(dnn.score(X_test_scaled, np.ravel(z_test)))
 
-"""
-|Scheduler      |eta |lambda      |mse   |
-|Constant       |0.1 |1e-5/0.00001|0.0146|
-|Momentum       |0.1 |1e-5        |0.0105|
-|Adagrad        |0.1 |0.01        |0.0264|
-|AdagradMomentum|0.1 |0.001       |0.0165|
-|RMS prop       |0.01|1e'5        |0.0174|
-|Adam           |0.01|0.001       |0.0167|
-"""
+# Build logistic regression model with a custom learning rate and L2 regularization
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=tf.keras.regularizers.l2(0.1))
+])
 
+# Compile the model with a custom optimizer
+custom_optimizer = tf.keras.optimizers.SGD(learning_rate=0.0)
+model.compile(optimizer=custom_optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+
+# Train the model
+model.fit(X_train_scaled, z_train, epochs=50, batch_size=batches, validation_data=(X_test_scaled, z_test))
+print(model.evaluate)

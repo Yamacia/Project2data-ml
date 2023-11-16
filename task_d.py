@@ -59,8 +59,8 @@ X_scaled = min_max_scaler.fit_transform(X)
 
 kf = KFold(n_splits = folds)
 
-dnn = MLPClassifier(solver = "adam", hidden_layer_sizes=64, activation='logistic',
-                    alpha=lam, learning_rate_init=eta, max_iter=epochs)
+dnn = MLPClassifier(solver = "adam", hidden_layer_sizes=(78,78,78,78), activation='logistic',
+                    alpha=lam, learning_rate_init=eta, max_iter=epochs, batch_size= batches, momentum=momentum)
 
 confusion = 0
 confusion_matrix = np.zeros((2, 2))
