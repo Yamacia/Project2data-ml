@@ -13,7 +13,10 @@ from schedulers import *
 from sklearn.preprocessing import MinMaxScaler
 
 warnings.simplefilter("error")
-
+"""
+Parts of the FFNN class is taken from the excercise notes from week 43
+We have expanded it with some additional methods
+"""
 
 class FFNN:
     """
@@ -478,6 +481,32 @@ class FFNN:
         X_val: np.ndarray = None,
         t_val: np.ndarray = None,
         ):
+        """
+        Description:
+        ------------
+            This function performs k-fold cross validation using the fit() method.
+
+        Parameters:
+        ------------
+            I    X (np.ndarray) : training data
+            II   t (np.ndarray) : target data
+            III  folds (int) : the amount of folds to cross validate
+            IV   scheduler (Scheduler) : specified scheduler (algorithm for optimization of gradient descent)
+
+        Optional Parameters:
+        ------------
+            V    batches (int) : number of batches the datasets are split into, default equal to 1
+            VI   epochs (int) : number of iterations used to train the network, default equal to 100
+            VII  lam (float) : regularization hyperparameter lambda
+            VIII X_val (np.ndarray) : validation set
+            IX   t_val (np.ndarray) : validation target set
+
+        Returns:
+        ------------
+            I   cv_scores (dict) : A dictionary containing the cross validated performance metrics of the model.
+                The number of the metrics depends on the parameters passed to the fit-function.
+
+        """
 
         if self.seed:
             np.random.seed(self.seed)
@@ -538,8 +567,39 @@ class FFNN:
         momentum = 0.03,
         rho = 0.9,
         rho2 = 0.99,
-        folds : int = 10,
+        folds : int = 5,
         ):
+        """
+        Description:
+        ------------
+            This function is here to optimize the parameters of different schedulers in an organized way.
+
+        Parameters:
+        ------------
+            I    X (np.ndarray) : training data
+            II   t (np.ndarray) : target data
+            III  etas (array) : the eta values to optimize for
+            IV   lams (array) : the lambda values to optimize for
+            V    scheduler (Scheduler) : specified scheduler (algorithm for optimization of gradient descent)
+
+        Optional Parameters:
+        ------------
+            V    batches (int) : number of batches the datasets are split into, default equal to 1
+            VI   epochs (int) : number of iterations used to train the network, default equal to 100
+            VII  lam (float) : regularization hyperparameter lambda
+            VIII X_val (np.ndarray) : validation set
+            IX   t_val (np.ndarray) : validation target set
+            X    momentum (float) : specify momentum for momentum gradient descent
+            XI   rho (float) : specify rho for gradient descent schedulers that use the parameter
+            XII  rho2 (float) : specify rho2 for gradient descent schedulers that use the parameter
+            XIII folds (int)  : specify folds for cross validation algorithm
+        Returns:
+        ------------
+            I   heatmap (array) : An array of arrays, where the accuracy/error is a "function" of lambdas and etas given as input
+            II  best_eta (float) : The best eta the algorithm found
+            III best_lambda (float) : The best lambda the algorithm found
+
+        """
 
         n_etas = len(etas)
         n_lambdas = len(lams)
@@ -582,6 +642,9 @@ class FFNN:
         return(heatmap, best_eta, best_lambda)
     
     def calculate_rate(self, true_count, false_count):
+        """
+        Helper method for calc_confusion, calculates the percentage of the true class for confusion matrix
+        """
         if true_count + false_count > 0:
             true_rate = true_count / (true_count + false_count)
             false_rate = false_count / (true_count + false_count)
@@ -590,6 +653,25 @@ class FFNN:
         return true_rate, false_rate
 
     def calc_confusion(self, t, pred):
+        """
+        Description:
+        ------------
+            Calculates the confusion matrix given various true and predicted vlaues
+
+        Parameters:
+        ------------
+            I    t (np.ndarray) : True values
+            II   pred (np.ndarray) : Predicted values
+
+        Returns:
+        ------------
+            I   confusion_matrix (np.ndarray) : The 2x2 confusion matrix:
+                    - Element [0,0]: True Negative Rate
+                    - Element [0,1]: False Negative Rate
+                    - Element [1,0]: False Positive Rate
+                    - Element [1,1]: True Positive Rate
+
+        """
         t = np.where(t, True, False)
         pred = np.where(pred, True, False)
         true_positive = np.sum(t * pred)
