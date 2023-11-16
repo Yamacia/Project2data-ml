@@ -6,7 +6,9 @@ from schedulers import *
 from FFNN import *
 from utils import *
 
-
+"""
+This script finds the optimal batches to use for Adam GD, with a signle hidden layer of the size int(X.shape[1] + 1)
+"""
 seed = np.random.seed(4231)
 
 #Number of datapoints to generate for
