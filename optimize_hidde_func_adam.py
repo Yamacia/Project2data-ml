@@ -5,14 +5,16 @@ import matplotlib.pyplot as plt
 from schedulers import *
 from FFNN import *
 from utils import *
-
+"""
+This script optimises hyperparameters for every hidden layer activation function, on Franke regression
+"""
 seed = np.random.seed(4231)
 
 #Number of datapoints to generate for
 datapoints = 20
 #Noise param for Franke function, use 0.0 for no noise
 noise = 0.05
-#If True use Franke, if False use Skranke
+#If True use Franke, if False use cancer dataset
 use_franke = True
 #Max polynomial degree
 maxDegree = 8
@@ -20,7 +22,7 @@ maxDegree = 8
 epochs = 500
 #Number of folds for cross validation
 folds = 5
-#Generates either Skranke or Franke dataset
+
 x, y, z, X, X_train, X_test, z_train, z_test = generate_dataset(use_franke, noise, 1 / datapoints, maxDegree)
 
 etas = np.logspace(-4, -1, 4)
